@@ -53,7 +53,7 @@ class LoginViewController: UIViewController {
 
 extension LoginViewController: LoginProtocol {
     func tappedCreateButton() {
-        print(#function)
+        
     }
     
     func tappedLoginButton() {
