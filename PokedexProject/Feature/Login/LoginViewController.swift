@@ -21,7 +21,7 @@ class LoginViewController: UIViewController {
         isEnableLoginButton(false)
         loginView?.delegate(delegate: self)
         loginView?.configTextField(delegate: self)
-        updateUIForMode()
+//        updateUIForMode()
     }
     
     override func loadView() {
