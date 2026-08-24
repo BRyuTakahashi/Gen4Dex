@@ -4,7 +4,7 @@
 
 <br>
 
-https://github.com/BRyuTakahashi/Gen4Dex/raw/main/screenshots/record.mp4
+https://github.com/BRyuTakahashi/Gen4Dex/raw/main/screenshots/record.gif
 
 <br>
 
