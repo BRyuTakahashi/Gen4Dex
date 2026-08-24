@@ -20,6 +20,21 @@ class LoginView: UIView {
         self.passwordTextField.delegate = delegate
     }
     
+    private lazy var segmentedControl: UISegmentedControl = {
+        let sc = UISegmentedControl(items: ["Login", "Cadastro"])
+        sc.translatesAutoresizingMaskIntoConstraints = false
+        sc.selectedSegmentIndex = 0  // começa no Login
+        sc.addTarget(self, action: #selector(segmentChanged), for: .valueChanged)
+        return sc
+    }()
+    
+    @objc func segmentChanged(_ sender: UISegmentedControl) {
+        let isCadastro = sender.selectedSegmentIndex == 1
+        
+        createButton.isHidden = !isCadastro
+        loginButton.isHidden = isCadastro
+    }
+    
     lazy var logoImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.translatesAutoresizingMaskIntoConstraints = false
@@ -109,13 +124,16 @@ class LoginView: UIView {
     lazy var createButton: UIButton = {
         let button = UIButton()
         button.translatesAutoresizingMaskIntoConstraints = false
+        button.addTarget(self, action: #selector(tappedCreateButton), for: .touchUpInside)
+        button.backgroundColor = UIColor(red: 100/255, green: 21/255, blue: 21/255, alpha: 1)
+        button.isEnabled = false
+        button.alpha = 0.4
         button.setTitle("Criar conta", for: .normal)
-        button.setTitleColor(UIColor(red: 232/255, green: 48/255, blue: 48/255, alpha: 1), for: .normal)
+        button.setTitleColor(.black, for: .normal)
         button.clipsToBounds = true
         button.layer.borderColor = UIColor(red: 232/255, green: 48/255, blue: 48/255, alpha: 1).cgColor
         button.layer.borderWidth = 2
         button.layer.cornerRadius = 6
-        button.addTarget(self, action: #selector(tappedCreateButton), for: .touchUpInside)
         return button
     }()
     
@@ -128,6 +146,7 @@ class LoginView: UIView {
         backgroundColor = UIColor(named: "background-white")
         addViews()
         configConstraints()
+        createButton.isHidden = true
     }
     
     required init?(coder: NSCoder) {
@@ -136,6 +155,7 @@ class LoginView: UIView {
     
      
     private func addViews() {
+        addSubview(segmentedControl)
         addSubview(pokeballImageView)
         addSubview(logoImageView)
         addSubview(emailLabel)
@@ -148,6 +168,10 @@ class LoginView: UIView {
     
     private func configConstraints() {
         NSLayoutConstraint.activate([
+            segmentedControl.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor),
+            segmentedControl.centerXAnchor.constraint(equalTo: centerXAnchor),
+            segmentedControl.widthAnchor.constraint(equalTo: widthAnchor, multiplier: 0.6),
+            
             pokeballImageView.topAnchor.constraint(equalTo: topAnchor, constant: -60),
             pokeballImageView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: 90),
             pokeballImageView.heightAnchor.constraint(equalToConstant: 300),
@@ -179,7 +203,7 @@ class LoginView: UIView {
             loginButton.trailingAnchor.constraint(equalTo: emailTextField.trailingAnchor),
             loginButton.heightAnchor.constraint(equalToConstant: 38),
             
-            createButton.topAnchor.constraint(equalTo: loginButton.bottomAnchor, constant: 30),
+            createButton.topAnchor.constraint(equalTo: passwordTextField.bottomAnchor, constant: 30),
             createButton.leadingAnchor.constraint(equalTo: emailTextField.leadingAnchor),
             createButton.trailingAnchor.constraint(equalTo: emailTextField.trailingAnchor),
             createButton.heightAnchor.constraint(equalToConstant: 38),

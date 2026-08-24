@@ -23,8 +23,8 @@ class PokemonDetailViewController: UIViewController {
     
     func buildStats() {
         measures = [
-            PokemonStat(name: "Height", value: String(format: "%.1fM", Double(pokemon.height) / 10)),
-            PokemonStat(name: "Weight", value: String(format: "%.1fKg", Double(pokemon.weight) / 10)),
+            PokemonStat(name: "Height", value: String(format: "%.1f m", Double(pokemon.height) / 10)),
+            PokemonStat(name: "Weight", value: String(format: "%.1f kg", Double(pokemon.weight) / 10)),
         ]
         
         stats = [

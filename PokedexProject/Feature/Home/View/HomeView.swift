@@ -17,15 +17,6 @@ class HomeView: UIView {
         return imageView
     }()
     
-    lazy var welcolmeLabel: UILabel = {
-        let label = UILabel()
-        label.translatesAutoresizingMaskIntoConstraints = false
-        label.text = "Bem vindo, Bruno"
-        label.textColor = UIColor(named: "text-gray")
-        label.font = UIFont.systemFont(ofSize: 22, weight: .bold)
-        return label
-    }()
-    
     lazy var filterTextField: UISearchBar = {
         let searchBar = UISearchBar()
         searchBar.translatesAutoresizingMaskIntoConstraints = false
@@ -71,7 +62,6 @@ class HomeView: UIView {
     
     private func addViews() {
         addSubview(pokeballImageView)
-        addSubview(welcolmeLabel)
         addSubview(filterTextField)
         addSubview(pokemonsCollectionView)
     }
@@ -83,10 +73,7 @@ class HomeView: UIView {
             pokeballImageView.heightAnchor.constraint(equalToConstant: 300),
             pokeballImageView.widthAnchor.constraint(equalToConstant: 300),
             
-            welcolmeLabel.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor, constant: 30),
-            welcolmeLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 20),
-            
-            filterTextField.topAnchor.constraint(equalTo: welcolmeLabel.bottomAnchor, constant: 20),
+            filterTextField.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor, constant: 50),
             filterTextField.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 20),
             filterTextField.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -20),
             filterTextField.heightAnchor.constraint(equalToConstant: 38),

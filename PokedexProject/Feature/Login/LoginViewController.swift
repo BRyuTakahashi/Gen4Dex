@@ -33,8 +33,10 @@ class LoginViewController: UIViewController {
     private func validateTextField() {
         if (loginView?.emailTextField.text ?? "").isValid(validType: .email) && (loginView?.passwordTextField.text ?? "").isValid(validType: .password) {
             isEnableLoginButton(true)
+            isEnableCreateButton(true)
         } else {
             isEnableLoginButton(false)
+            isEnableCreateButton(false)
         }
     }
     
@@ -49,11 +51,32 @@ class LoginViewController: UIViewController {
             loginView?.loginButton.alpha = 0.4
         }
     }
+    
+    private func isEnableCreateButton(_ isEnable: Bool) {
+        if isEnable {
+            loginView?.createButton.backgroundColor = UIColor(red: 232/255, green: 48/255, blue: 48/255, alpha: 1)
+            loginView?.createButton.isEnabled = true
+            loginView?.createButton.alpha = 1
+        } else {
+            loginView?.createButton.backgroundColor = UIColor(red: 100/255, green: 21/255, blue: 21/255, alpha: 1)
+            loginView?.createButton.isEnabled = false
+            loginView?.createButton.alpha = 0.4
+        }
+    }
 }
 
 extension LoginViewController: LoginProtocol {
+    
     func tappedCreateButton() {
-        
+        auth?.createUser(withEmail: self.loginView?.emailTextField.text ?? "", password: self.loginView?.passwordTextField.text ?? "") { user, error in
+            if error != nil{
+                self.alert?.getAlert(title: "Error ao criar conta", message: "Falha na conexão")
+            } else {
+                let homeVC = HomeViewController()
+                homeVC.modalPresentationStyle = .fullScreen
+                self.present(homeVC, animated: true)
+            }
+        }
     }
     
     func tappedLoginButton() {
@@ -61,7 +84,9 @@ extension LoginViewController: LoginProtocol {
             if error != nil {
                 self.alert?.getAlert(title: "Error ao logar", message: "Email ou senha invalidos")
             } else {
-                print("sucesso!")
+                let homeVC = HomeViewController()
+                homeVC.modalPresentationStyle = .fullScreen
+                self.present(homeVC, animated: true)
             }
         }
     }

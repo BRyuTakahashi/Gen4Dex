@@ -41,6 +41,23 @@ class PokemonDetailView: UIView {
         return label
     }()
     
+    lazy var pokeballImageView: UIImageView = {
+        let imageView = UIImageView()
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        imageView.image = UIImage(named: "pokeball-icon2")
+        imageView.layer.opacity = 0.2
+        return imageView
+    }()
+    
+    lazy var backgroundDetailImageView: UIImageView = {
+        let imageView = UIImageView()
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        imageView.image = UIImage(named: "details")
+        imageView.contentMode = .scaleAspectFit
+        imageView.layer.opacity = 0.2
+        return imageView
+    }()
+    
     lazy var type1View: UIView = {
         let view = UIView()
         view.translatesAutoresizingMaskIntoConstraints = false
@@ -112,9 +129,11 @@ class PokemonDetailView: UIView {
     
     private func addViews() {
         addSubview(backgroundView)
+        addSubview(pokeballImageView)
         addSubview(pokemonDetailView)
         addSubview(pokemonNameLabel)
         addSubview(pokemonNumberLabel)
+        addSubview(backgroundDetailImageView)
         type1View.addSubview(type1Label)
         type2View.addSubview(type2Label)
         addSubview(type1View)
@@ -141,6 +160,16 @@ class PokemonDetailView: UIView {
             
             pokemonNumberLabel.bottomAnchor.constraint(equalTo: pokemonNameLabel.bottomAnchor),
             pokemonNumberLabel.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -50),
+            
+            pokeballImageView.topAnchor.constraint(equalTo: pokemonNumberLabel.bottomAnchor, constant: 25),
+            pokeballImageView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: 100),
+            pokeballImageView.heightAnchor.constraint(equalToConstant: 300),
+            pokeballImageView.widthAnchor.constraint(equalToConstant: 300),
+            
+            backgroundDetailImageView.topAnchor.constraint(equalTo: pokemonNumberLabel.bottomAnchor, constant: 55),
+            backgroundDetailImageView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 75),
+            backgroundDetailImageView.heightAnchor.constraint(equalToConstant: 100),
+            backgroundDetailImageView.widthAnchor.constraint(equalToConstant: 150),
             
             type1View.topAnchor.constraint(equalTo: pokemonNameLabel.bottomAnchor, constant: 30),
             type1View.leadingAnchor.constraint(equalTo: pokemonNameLabel.leadingAnchor),
