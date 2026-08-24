@@ -4,7 +4,7 @@
 
 <br>
 
-![Demo](screenshots/demo.gif)
+![Demo](screenshots/record.gif)
 
 <br>
 
