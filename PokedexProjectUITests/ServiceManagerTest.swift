@@ -34,6 +34,14 @@ final class ServiceManagerTest: XCTestCase {
 
     func testFetchPokemonFailure() {
         
+        homeService.fetchPokemonList { result in
+            switch result {
+            case .success:
+                XCTFail("A request não pode cair em success")
+            case .failure(let error):
+                XCTAssertNotNil(error)
+            }
+        }
     }
 
 }

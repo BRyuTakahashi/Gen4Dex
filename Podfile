@@ -10,7 +10,6 @@ target 'PokedexProject' do
   pod 'FirebaseAuth'
   pod 'FirebaseFirestore'
   pod 'SDWebImage'
-  pod 'OHHTTPStubs/Swift'
 
   target 'PokedexProjectUITests' do
     inherit! :search_paths
