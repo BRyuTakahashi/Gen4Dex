@@ -45,3 +45,13 @@ final class ServiceManagerTest: XCTestCase {
     }
 
 }
+
+class MockURLSession: URLSessionProtocol {
+    var data: Data?
+    var response: URLResponse?
+    var error: Error?
+    
+    func dataTask(with request: URLRequest, completionHandler: @escaping (Data?, URLResponse?, Error?) -> Void) {
+        completionHandler(data, response, error)
+    }
+}

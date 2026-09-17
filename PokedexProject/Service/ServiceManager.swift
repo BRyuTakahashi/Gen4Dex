@@ -19,7 +19,7 @@ class ServiceManager: NetworkLayer {
         var request = URLRequest(url: url)
         request.httpMethod = method.rawValue
         
-        let task = session.dataTask(with: request) { data, response, error in
+        session.dataTask(with: request) { data, response, error in
             DispatchQueue.main.async {
                 if let error {
                     completion(.failure(.networkFailure(error)))
@@ -46,9 +46,15 @@ class ServiceManager: NetworkLayer {
                 }
             }
         }
-        task.resume()
     }
         
 }
 
-extension URLSession: URLSessionProtocol {}
+extension URLSession: URLSessionProtocol {
+    func dataTask(
+        with request: URLRequest,
+        completionHandler: @escaping (Data?, URLResponse?, Error?) -> Void)
+    {
+        dataTask(with: request, completionHandler: completionHandler).resume()
+    }
+}
