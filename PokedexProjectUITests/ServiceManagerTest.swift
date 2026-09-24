@@ -11,19 +11,26 @@ import XCTest
 final class ServiceManagerTest: XCTestCase {
     
     var homeService: HomeService!
+    var serviceManager: ServiceManager!
+    var mockURLSession: MockURLSession!
 
     override func setUpWithError() throws {
-        homeService = HomeService()
+        mockURLSession = MockURLSession()
+        serviceManager = ServiceManager(session: mockURLSession)
+        homeService = HomeService(serviceManager: serviceManager)
     }
 
     override func tearDownWithError() throws {
         homeService = nil
+        serviceManager = nil
+        mockURLSession = nil
     }
 
     func testFetchPokemonListSuccess() {
         homeService.fetchPokemonList { result in
             switch result {
             case .success(let success):
+                print(success)
                 XCTAssertNotNil(success, "Success não pode ser nil")
                 XCTAssertGreaterThan(success.count, 0, "Deve retornar 1 ou mais pokemons")
             case .failure:

@@ -1,13 +1,20 @@
 import Foundation
 
 class HomeService {
+    
+    var serviceManager: ServiceManager
+    
+    init(serviceManager: ServiceManager = ServiceManager()) {
+        self.serviceManager = serviceManager
+    }
+    
     public func fetchPokemonList(completion: @escaping(Result<[Pokemon], NetworkError>) -> Void) {
         let group = DispatchGroup()
         let url: String = "https://pokeapi.co/api/v2/pokemon?limit=107&offset=386"
         var urls: [String] = []
         var pokemonList: [Pokemon] = []
         
-        ServiceManager.shared.request(with: url, method: .get, DecodeType: PokemonListResponse.self) { result in
+        serviceManager.request(with: url, method: .get, DecodeType: PokemonListResponse.self) { result in
             switch result {
             case .success(let success):
                 urls = success.results.map { $0.url}
@@ -15,7 +22,7 @@ class HomeService {
                 for url in urls {
                     group.enter()
                     
-                    ServiceManager.shared.request(with: url, method: .get, DecodeType: Pokemon.self) { result in
+                    self.serviceManager.request(with: url, method: .get, DecodeType: Pokemon.self) { result in
                         switch result {
                         case .success(let pokemon):
                             pokemonList.append(pokemon)
