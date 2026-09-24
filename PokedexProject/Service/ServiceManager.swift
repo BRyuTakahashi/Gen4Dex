@@ -4,7 +4,11 @@ class ServiceManager: NetworkLayer {
     
     static let shared: ServiceManager = ServiceManager()
     
-    let session: URLSession = URLSession.shared
+    var session: URLSessionProtocol
+    
+    init(session: URLSessionProtocol = URLSession.shared) {
+        self.session = session
+    }
     
     func request<T>(with urlString: String, method: HTTPMethod, DecodeType: T.Type, completion: @escaping (Result<T, NetworkError>) -> Void) where T : Decodable {
         guard let url = URL(string: urlString) else {
@@ -15,7 +19,7 @@ class ServiceManager: NetworkLayer {
         var request = URLRequest(url: url)
         request.httpMethod = method.rawValue
         
-        let task = session.dataTask(with: request) { data, response, error in
+        session.dataTask(with: request) { data, response, error in
             DispatchQueue.main.async {
                 if let error {
                     completion(.failure(.networkFailure(error)))
@@ -42,8 +46,15 @@ class ServiceManager: NetworkLayer {
                 }
             }
         }
-        task.resume()
     }
-    
-    
+        
+}
+
+extension URLSession: URLSessionProtocol {
+    func dataTask(
+        with request: URLRequest,
+        completionHandler: @escaping (Data?, URLResponse?, Error?) -> Void)
+    {
+        dataTask(with: request, completionHandler: completionHandler).resume()
+    }
 }

@@ -10,19 +10,55 @@ import XCTest
 
 final class ServiceManagerTest: XCTestCase {
     
+    var homeService: HomeService!
     var serviceManager: ServiceManager!
+    var mockURLSession: MockURLSession!
 
     override func setUpWithError() throws {
-        serviceManager = ServiceManager()
+        mockURLSession = MockURLSession()
+        serviceManager = ServiceManager(session: mockURLSession)
+        homeService = HomeService(serviceManager: serviceManager)
     }
 
     override func tearDownWithError() throws {
+        homeService = nil
         serviceManager = nil
+        mockURLSession = nil
     }
 
-    func testExample() {
+    func testFetchPokemonListSuccess() {
+        homeService.fetchPokemonList { result in
+            switch result {
+            case .success(let success):
+                print(success)
+                XCTAssertNotNil(success, "Success não pode ser nil")
+                XCTAssertGreaterThan(success.count, 0, "Deve retornar 1 ou mais pokemons")
+            case .failure:
+                XCTFail("Não pode cair em fail")
+            }
+        }
+    }
+
+    func testFetchPokemonFailure() {
         
+        homeService.fetchPokemonList { result in
+            switch result {
+            case .success:
+                XCTFail("A request não pode cair em success")
+            case .failure(let error):
+                XCTAssertNotNil(error)
+            }
+        }
     }
 
+}
 
+class MockURLSession: URLSessionProtocol {
+    var data: Data?
+    var response: URLResponse?
+    var error: Error?
+    
+    func dataTask(with request: URLRequest, completionHandler: @escaping (Data?, URLResponse?, Error?) -> Void) {
+        completionHandler(data, response, error)
+    }
 }

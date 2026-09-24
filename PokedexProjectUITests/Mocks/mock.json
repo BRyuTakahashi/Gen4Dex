@@ -1,0 +1,9 @@
+let json = """
+{
+    "results": [
+        {"name": "turtwig", "url": "https://pokeapi.co/api/v2/pokemon/387"}
+    ]
+}
+""".data(using: .utf8)
+
+mockURLSession.data = json

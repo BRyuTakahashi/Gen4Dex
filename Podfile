@@ -7,8 +7,12 @@ target 'PokedexProject' do
 
   # Pods for PokedexProject
 
-pod 'FirebaseAuth'
-pod 'FirebaseFirestore'
-pod 'SDWebImage'
+  pod 'FirebaseAuth'
+  pod 'FirebaseFirestore'
+  pod 'SDWebImage'
+
+  target 'PokedexProjectUITests' do
+    inherit! :search_paths
+  end
 
 end
