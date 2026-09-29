@@ -10,10 +10,10 @@ import XCTest
 
 final class ServiceManagerTest: XCTestCase {
     
-    var homeService: HomeService!
-    var serviceManager: ServiceManager!
     var mockURLSession: MockURLSession!
-
+    var serviceManager: ServiceManager!
+    var homeService: HomeService!
+    
     override func setUpWithError() throws {
         mockURLSession = MockURLSession()
         serviceManager = ServiceManager(session: mockURLSession)
@@ -27,6 +27,92 @@ final class ServiceManagerTest: XCTestCase {
     }
 
     func testFetchPokemonListSuccess() {
+        let json = """
+        {
+            "results": [
+                {"name": "turtwig", "url": "https://pokeapi.co/api/v2/pokemon/387"}
+            ]
+        }
+        """.data(using: .utf8)
+        
+        let pokemonDetail = """
+        {
+            "id": 387,
+            "name": "turtwig",
+            "types": [
+                {
+                    "type": {
+                        "name": "grass"
+                    }
+                }
+            ],
+            "sprites": {
+                "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/387.png",
+                "other": {
+                    "official-artwork": {
+                        "front-default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/387.png"
+                    }
+                }
+            },
+            "stats": [
+                {
+                    "base_stat": 55,
+                    "effort": 0,
+                    "stat": {
+                        "name": "hp"
+                    }
+                },
+                {
+                    "base_stat": 68,
+                    "effort": 1,
+                    "stat": {
+                        "name": "attack"
+                    }
+                },
+                {
+                    "base_stat": 64,
+                    "effort": 0,
+                    "stat": {
+                        "name": "defense"
+                    }
+                },
+                {
+                    "base_stat": 45,
+                    "effort": 0,
+                    "stat": {
+                        "name": "special-attack"
+                    }
+                },
+                {
+                    "base_stat": 55,
+                    "effort": 0,
+                    "stat": {
+                        "name": "special-defense"
+                    }
+                },
+                {
+                    "base_stat": 31,
+                    "effort": 0,
+                    "stat": {
+                        "name": "speed"
+                    }
+                }
+            ],
+            "weight": 102,
+            "height": 4
+        }
+        """.data(using: .utf8)
+        
+        mockURLSession.listData = json
+        mockURLSession.detailData = pokemonDetail
+        
+        mockURLSession.response = HTTPURLResponse(
+            url: URL(string: "https://pokeapi.co")!,
+            statusCode: 200,
+            httpVersion: nil,
+            headerFields: nil
+        )
+        
         homeService.fetchPokemonList { result in
             switch result {
             case .success(let success):
@@ -41,11 +127,14 @@ final class ServiceManagerTest: XCTestCase {
 
     func testFetchPokemonFailure() {
         
+        mockURLSession.error = NSError(domain: "Caso de erro", code: 404)
+        
         homeService.fetchPokemonList { result in
             switch result {
             case .success:
                 XCTFail("A request não pode cair em success")
             case .failure(let error):
+                print("caso de error 2")
                 XCTAssertNotNil(error)
             }
         }
@@ -57,8 +146,16 @@ class MockURLSession: URLSessionProtocol {
     var data: Data?
     var response: URLResponse?
     var error: Error?
+    var listData: Data?
+    var detailData: Data?
     
     func dataTask(with request: URLRequest, completionHandler: @escaping (Data?, URLResponse?, Error?) -> Void) {
-        completionHandler(data, response, error)
+        if request.url?.absoluteString.contains("pokemon?limit") == true {
+            completionHandler(listData, response, error)
+        } else if request.url?.absoluteString.contains("pokemon/387") == true {
+            completionHandler(detailData, response, error)
+        } else {
+            completionHandler(data, response, error)
+        }
     }
 }
