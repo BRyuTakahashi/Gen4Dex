@@ -129,13 +129,63 @@ final class ServiceManagerTest: XCTestCase {
         
         mockURLSession.error = NSError(domain: "Caso de erro", code: 404)
         
+        
         homeService.fetchPokemonList { result in
             switch result {
             case .success:
                 XCTFail("A request não pode cair em success")
             case .failure(let error):
-                print("caso de error 2")
-                XCTAssertNotNil(error)
+                XCTAssertNotNil(error, "Conection error")
+            }
+        }
+    }
+    
+    func testFetchPokemonInvalidJSONFailure() {
+        
+        let json = """
+        {
+            "results": [
+                {"name": "turtwig", "url": https://pokeapi.co/api/v2/pokemon/387}
+            ]
+        }
+        """.data(using: .utf8)
+        
+        mockURLSession.listData = json
+        
+        homeService.fetchPokemonList { result in
+            switch result {
+            case .success:
+                XCTFail("A request não pode cair em success")
+            case .failure(let error):
+                XCTAssertNotNil(error, "Invalid JSON")
+            }
+        }
+        
+    }
+    
+    func testFetchPokemonEmptyDataSuccess() {
+        
+        let json = """
+        {
+            "results": []
+        }
+        """.data(using: .utf8)
+        
+        mockURLSession.listData = json
+        
+        mockURLSession.response = HTTPURLResponse(
+            url: URL(string: "https://pokeapi.co")!,
+            statusCode: 200,
+            httpVersion: nil,
+            headerFields: nil
+        )
+        
+        homeService.fetchPokemonList { result in
+            switch result {
+            case .success(let pokemon):
+                XCTAssertEqual(pokemon.count, 0, "It should return a empty list")
+            case .failure:
+                XCTFail("I should'n return a error")
             }
         }
     }
