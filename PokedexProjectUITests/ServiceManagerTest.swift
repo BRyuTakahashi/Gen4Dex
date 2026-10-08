@@ -19,13 +19,13 @@ final class ServiceManagerTest: XCTestCase {
         serviceManager = ServiceManager(session: mockURLSession)
         homeService = HomeService(serviceManager: serviceManager)
     }
-
+    
     override func tearDownWithError() throws {
         homeService = nil
         serviceManager = nil
         mockURLSession = nil
     }
-
+    
     func testFetchPokemonListSuccess() {
         let json = """
         {
@@ -124,7 +124,7 @@ final class ServiceManagerTest: XCTestCase {
             }
         }
     }
-
+    
     func testFetchPokemonFailure() {
         
         mockURLSession.error = NSError(domain: "Caso de erro", code: 404)
@@ -185,11 +185,86 @@ final class ServiceManagerTest: XCTestCase {
             case .success(let pokemon):
                 XCTAssertEqual(pokemon.count, 0, "It should return a empty list")
             case .failure:
-                XCTFail("I should'n return a error")
+                XCTFail("It should'n return a error")
             }
         }
     }
-
+    
+    func testFetchPokemonInvalidURLFailure() {
+        serviceManager.request(
+            with: "invalid url $$##",
+            method: .get,
+            DecodeType: Pokemon.self
+        ) { result in
+            switch result {
+            case .success:
+                XCTFail("It should'n return a success")
+            case .failure(_):
+                guard case .failure(let failure) = result,
+                      case .invalidURL = failure else {
+                    XCTFail("Must return invalid URL")
+                    return
+                }
+            }
+        }
+    }
+    
+    func testFetchPokemonNotFoundFailure() {
+        let json = """
+        {
+            "results": [
+                {"name": "turtwig", "url": "https://pokeapi.co/api/v2/pokemon/387"}
+            ]
+        }
+        """.data(using: .utf8)
+        
+        mockURLSession.listData = json
+        
+        mockURLSession.response = HTTPURLResponse(
+            url: URL(string: "https://pokeapi.co")!,
+            statusCode: 404,
+            httpVersion: nil,
+            headerFields: nil
+        )
+        
+        homeService.fetchPokemonList { result in
+            switch result {
+            case .success:
+                XCTFail("It should'n return a success")
+            case .failure(let failure):
+                XCTAssertNotNil(failure, "Status code must be 404")
+            }
+        }
+    }
+    
+    func testFetchPokemonInternalErrorFailure() {
+        let json = """
+        {
+            "results": [
+                {"name": "turtwig", "url": "https://pokeapi.co/api/v2/pokemon/387"}
+            ]
+        }
+        """.data(using: .utf8)
+        
+        mockURLSession.listData = json
+        
+        mockURLSession.response = HTTPURLResponse(
+            url: URL(string: "https://pokeapi.co")!,
+            statusCode: 500,
+            httpVersion: nil,
+            headerFields: nil
+        )
+        
+        homeService.fetchPokemonList { result in
+            switch result {
+            case .success:
+                XCTFail("It should'n return a success")
+            case .failure(let failure):
+                XCTAssertNotNil(failure, "Status code must be 500")
+            }
+        }
+    }
+    
 }
 
 class MockURLSession: URLSessionProtocol {

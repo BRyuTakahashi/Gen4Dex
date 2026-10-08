@@ -12,16 +12,20 @@ class HomeViewModel: NSObject {
     private var pokemonList: [Pokemon] = []
     public var searchPokemonList: [Pokemon] = []
     
-    private let homeService: HomeService = HomeService()
+    private var homeService: HomeService?
     
     private weak var delegate: HomeViewModelProtocol?
+    
+    init(homeService: HomeService = HomeService()) {
+        self.homeService = homeService
+    }
     
     public func delegate(delegate: HomeViewModelProtocol?) {
         self.delegate = delegate
     }
     
     public func fetchPokemon() {
-        homeService.fetchPokemonList { [weak self] result in
+        homeService?.fetchPokemonList { [weak self] result in
             guard let self else { return }
             switch result {
             case .success(let success):
