@@ -34,6 +34,8 @@ final class HomeViewModelTest: XCTestCase {
     }
 
     func testFetchPokemonSuccess() {
+        // ... configura os dados ...
+        
         let json = """
         {
             "results": [
@@ -41,78 +43,31 @@ final class HomeViewModelTest: XCTestCase {
             ]
         }
         """.data(using: .utf8)
-        
+
         let pokemonDetail = """
         {
             "id": 387,
             "name": "turtwig",
-            "types": [
-                {
-                    "type": {
-                        "name": "grass"
-                    }
-                }
-            ],
+            "types": [{"type": {"name": "grass"}}],
             "sprites": {
-                "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/387.png",
-                "other": {
-                    "official-artwork": {
-                        "front-default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/387.png"
-                    }
-                }
+                "front_default": "https://...",
+                "other": {"official-artwork": {"front_default": "https://..."}}
             },
             "stats": [
-                {
-                    "base_stat": 55,
-                    "effort": 0,
-                    "stat": {
-                        "name": "hp"
-                    }
-                },
-                {
-                    "base_stat": 68,
-                    "effort": 1,
-                    "stat": {
-                        "name": "attack"
-                    }
-                },
-                {
-                    "base_stat": 64,
-                    "effort": 0,
-                    "stat": {
-                        "name": "defense"
-                    }
-                },
-                {
-                    "base_stat": 45,
-                    "effort": 0,
-                    "stat": {
-                        "name": "special-attack"
-                    }
-                },
-                {
-                    "base_stat": 55,
-                    "effort": 0,
-                    "stat": {
-                        "name": "special-defense"
-                    }
-                },
-                {
-                    "base_stat": 31,
-                    "effort": 0,
-                    "stat": {
-                        "name": "speed"
-                    }
-                }
+                {"base_stat": 55, "effort": 0, "stat": {"name": "hp"}},
+                {"base_stat": 68, "effort": 1, "stat": {"name": "attack"}},
+                {"base_stat": 64, "effort": 0, "stat": {"name": "defense"}},
+                {"base_stat": 45, "effort": 0, "stat": {"name": "special-attack"}},
+                {"base_stat": 55, "effort": 0, "stat": {"name": "special-defense"}},
+                {"base_stat": 31, "effort": 0, "stat": {"name": "speed"}}
             ],
             "weight": 102,
             "height": 4
         }
         """.data(using: .utf8)
-        
+
         mockURLSession.listData = json
         mockURLSession.detailData = pokemonDetail
-        
         mockURLSession.response = HTTPURLResponse(
             url: URL(string: "https://pokeapi.co")!,
             statusCode: 200,
@@ -120,12 +75,72 @@ final class HomeViewModelTest: XCTestCase {
             headerFields: nil
         )
         
-        homeViewModel.delegate(delegate: mockDelegate)
+        let expectation = expectation(description: "fetchPokemon success")
+        
+        // sobrescreve o delegate para também cumprir a expectation
+        class MockDelegateWithExpectation: HomeViewModelProtocol {
+            var expectation: XCTestExpectation
+            var successCalled = false
+            
+            init(expectation: XCTestExpectation) {
+                self.expectation = expectation
+            }
+            
+            func success() {
+                successCalled = true
+                expectation.fulfill()
+            }
+            func failure() {
+                expectation.fulfill()
+            }
+        }
+        
+        let delegateWithExp = MockDelegateWithExpectation(expectation: expectation)
+        homeViewModel.delegate(delegate: delegateWithExp)
         
         homeViewModel.fetchPokemon()
         
-        XCTAssert(mockDelegate.successCalled, "Must return true")
+        waitForExpectations(timeout: 1.0)
+        
+        XCTAssertTrue(delegateWithExp.successCalled)
+        homeViewModel.filterSearchText("")
         XCTAssertEqual(homeViewModel.getPokemonList().count, 1)
+    }
+    
+    func testFetchPokemonFailure() {
+        mockURLSession.error = NSError(domain: "test", code: 404)
+        
+        class MockDelegateWithExpectation: HomeViewModelProtocol {
+            var expectation: XCTestExpectation
+            var successCalled = false
+            var failureCalled = false
+            
+            init(expectation: XCTestExpectation) {
+                self.expectation = expectation
+            }
+            
+            func success() {
+                successCalled = true
+                expectation.fulfill()
+            }
+            func failure() {
+                failureCalled = true
+                expectation.fulfill()
+            }
+        }
+        
+        let expectation = expectation(description: "fetchPokemon failure")
+        
+        let delegateWithExp = MockDelegateWithExpectation(expectation: expectation)
+        homeViewModel.delegate(delegate: delegateWithExp)
+        
+        homeViewModel.fetchPokemon()
+        
+        waitForExpectations(timeout: 1.0)
+        
+        XCTAssertFalse(delegateWithExp.successCalled)
+        XCTAssertTrue(delegateWithExp.failureCalled)
+        XCTAssertEqual(homeViewModel.numberOfItems(), 0)
     }
 
 }

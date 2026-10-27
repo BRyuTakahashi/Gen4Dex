@@ -32,6 +32,7 @@ class HomeViewModel: NSObject {
                 self.pokemonList = success.sorted { $0.id < $1.id }
                 self.delegate?.success()
             case .failure(let failure):
+                print("4- HomeViewModel failure")
                 print(failure)
                 self.delegate?.failure()
             }

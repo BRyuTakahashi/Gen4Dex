@@ -276,10 +276,13 @@ class MockURLSession: URLSessionProtocol {
     
     func dataTask(with request: URLRequest, completionHandler: @escaping (Data?, URLResponse?, Error?) -> Void) {
         if request.url?.absoluteString.contains("pokemon?limit") == true {
+            print("1- ServiceManagerTest success")
             completionHandler(listData, response, error)
         } else if request.url?.absoluteString.contains("pokemon/387") == true {
+            print("1 -ServiceManagerTest success")
             completionHandler(detailData, response, error)
         } else {
+            print("ServiceManagerTest failure")
             completionHandler(data, response, error)
         }
     }
