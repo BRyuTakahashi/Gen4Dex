@@ -104,7 +104,7 @@ final class ServiceManagerTest: XCTestCase {
         """.data(using: .utf8)
         
         mockURLSession.listData = json
-        mockURLSession.detailData = pokemonDetail
+        mockURLSession.detailDataByURL["pokemon/387"] = pokemonDetail
         
         mockURLSession.response = HTTPURLResponse(
             url: URL(string: "https://pokeapi.co")!,
@@ -268,22 +268,23 @@ final class ServiceManagerTest: XCTestCase {
 }
 
 class MockURLSession: URLSessionProtocol {
-    var data: Data?
     var response: URLResponse?
     var error: Error?
     var listData: Data?
-    var detailData: Data?
+    var detailDataByURL: [String: Data] = [:]
     
     func dataTask(with request: URLRequest, completionHandler: @escaping (Data?, URLResponse?, Error?) -> Void) {
-        if request.url?.absoluteString.contains("pokemon?limit") == true {
-            print("1- ServiceManagerTest success")
+        let url = request.url?.absoluteString ?? ""
+        
+        if url.contains("pokemon?limit") {
             completionHandler(listData, response, error)
-        } else if request.url?.absoluteString.contains("pokemon/387") == true {
-            print("1 -ServiceManagerTest success")
-            completionHandler(detailData, response, error)
+            return
+        } else if let par = (detailDataByURL.first(where: {url.contains($0.key)})){
+            completionHandler(par.value, response, error)
+            return
         } else {
-            print("ServiceManagerTest failure")
-            completionHandler(data, response, error)
+            completionHandler(nil, response, error)
+            return
         }
     }
 }
