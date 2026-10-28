@@ -12,22 +12,27 @@ class HomeViewModel: NSObject {
     private var pokemonList: [Pokemon] = []
     public var searchPokemonList: [Pokemon] = []
     
-    private let homeService: HomeService = HomeService()
+    private var homeService: HomeService?
     
     private weak var delegate: HomeViewModelProtocol?
+    
+    init(homeService: HomeService = HomeService()) {
+        self.homeService = homeService
+    }
     
     public func delegate(delegate: HomeViewModelProtocol?) {
         self.delegate = delegate
     }
     
     public func fetchPokemon() {
-        homeService.fetchPokemonList { [weak self] result in
+        homeService?.fetchPokemonList { [weak self] result in
             guard let self else { return }
             switch result {
             case .success(let success):
                 self.pokemonList = success.sorted { $0.id < $1.id }
                 self.delegate?.success()
             case .failure(let failure):
+                print("4- HomeViewModel failure")
                 print(failure)
                 self.delegate?.failure()
             }

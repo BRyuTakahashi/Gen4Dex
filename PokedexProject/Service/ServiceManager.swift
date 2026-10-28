@@ -22,16 +22,20 @@ class ServiceManager: NetworkLayer {
         session.dataTask(with: request) { data, response, error in
             DispatchQueue.main.async {
                 if let error {
+                    print("2- ServiceManager error")
                     completion(.failure(.networkFailure(error)))
                     print("ERROR -> \(error.localizedDescription)")
+                    return
                 }
                 
                 guard let response = response as? HTTPURLResponse, 200...299 ~= response.statusCode else {
+                    print("5- ServiceManager response")
                     completion(.failure(.invalidResponse))
                     return
                 }
                 
                 guard let data else {
+                    print("ServiceManager data")
                     completion(.failure(.noData))
                     return
                 }
@@ -40,8 +44,10 @@ class ServiceManager: NetworkLayer {
                     let decoder = JSONDecoder()
                     decoder.dateDecodingStrategy = .iso8601
                     let object = try decoder.decode(T.self, from: data)
+                    print("ServiceManager decoder")
                     completion(.success(object))
                 } catch {
+                    print("ServiceManager decoder error")
                     completion(.failure(.decodingError(error)))
                 }
             }
@@ -55,6 +61,7 @@ extension URLSession: URLSessionProtocol {
         with request: URLRequest,
         completionHandler: @escaping (Data?, URLResponse?, Error?) -> Void)
     {
+        print("ServiceManager dataTask")
         dataTask(with: request, completionHandler: completionHandler).resume()
     }
 }

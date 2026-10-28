@@ -8,7 +8,7 @@
 import Foundation
 import UIKit
 
-enum TypeColor: String {
+enum TypeColor: String, CaseIterable {
     case grass
     case fire
     case water

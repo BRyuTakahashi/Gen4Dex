@@ -39,7 +39,8 @@ class HomeService {
                 }
                 
             case .failure(let failure):
-                print(failure)
+                print("3- HomeService failure")
+                completion(.failure(failure))
             }
         }
     }
