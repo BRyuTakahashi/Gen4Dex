@@ -1,0 +1,21 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Instalar Pods
+        run: xcodebuild test
+      - name: Rodar testes
+        run: |
+          xcodebuild test \
+            -workspace ____ \
+            -scheme ____ \
+            -destination 'platform=iOS Simulator,name=____'
