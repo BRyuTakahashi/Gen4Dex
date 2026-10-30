@@ -19,3 +19,7 @@ jobs:
             -workspace ____ \
             -scheme ____ \
             -destination 'platform=iOS Simulator,name=____'
+      - name: Criar GoogleService-Info.plist
+        env:
+          GOOGLE_SERVICE_INFO: ${{ secrets.GOOGLE_SERVICE_INFO }}
+        run: echo "$GOOGLE_SERVICE_INFO" | base64 --decode > Desktop/GoogleService-Info.plist
